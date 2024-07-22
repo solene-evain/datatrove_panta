@@ -40,7 +40,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
             world_size: int)
         tasks: total number of tasks to run the pipeline on
         time: slurm time limit
-        partition: slurm partition
+        constraint: slurm partition
         cpus_per_task: how many cpus to give each task. should be 1
             except when you need to give each task more memory
         mem_per_cpu_gb: slurm option. use in conjunction with the
@@ -86,7 +86,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         pipeline: list[PipelineStep | Callable],
         tasks: int,
         time: str,
-        partition: str,
+        constraint: str,
         cpus_per_task: int = 1,
         mem_per_cpu_gb: int = 2,
         workers: int = -1,
@@ -116,7 +116,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         super().__init__(pipeline, logging_dir, skip_completed, randomize_start_duration)
         self.tasks = tasks
         self.workers = workers
-        self.partition = partition
+        self.constraint = constraint
         self.cpus_per_task = cpus_per_task
         self.mem_per_cpu_gb = mem_per_cpu_gb
         self.tasks_per_job = tasks_per_job
@@ -295,7 +295,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         sbatch_args = {
             "cpus-per-task": self.cpus_per_task,
             "mem-per-cpu": f"{self.mem_per_cpu_gb}G",
-            "partition": self.partition,
+            "constraint": self.constraint,
             "job-name": self.job_name,
             "time": self.time,
             "output": slurm_logfile,
