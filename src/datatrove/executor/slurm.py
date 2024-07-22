@@ -86,14 +86,15 @@ class SlurmPipelineExecutor(PipelineExecutor):
         pipeline: list[PipelineStep | Callable],
         tasks: int,
         time: str,
+        account: str,
         constraint: str,
         cpus_per_task: int = 1,
         mem_per_cpu_gb: int = 2,
         workers: int = -1,
         job_name: str = "data_processing",
-        qos: str = "normal",
+        #qos: str = "normal",
         env_command: str = None,
-        condaenv: str = None,
+        condaenv: str = datatrove,
         venv_path: str = None,
         sbatch_args: dict | None = None,
         max_array_size: int = 1001,
@@ -108,7 +109,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         randomize_start_duration: int = 0,
         requeue_signals: tuple[str] | None = ("SIGUSR1",),
         mail_type: str = "ALL",
-        mail_user: str = None,
+        mail_user: str = "solene.evain@univ-grenoble-alpes.fr",
         requeue: bool = True,
         srun_args: dict = None,
         tasks_per_job: int = 1,
@@ -116,13 +117,14 @@ class SlurmPipelineExecutor(PipelineExecutor):
         super().__init__(pipeline, logging_dir, skip_completed, randomize_start_duration)
         self.tasks = tasks
         self.workers = workers
+        self.account = account
         self.constraint = constraint
         self.cpus_per_task = cpus_per_task
         self.mem_per_cpu_gb = mem_per_cpu_gb
         self.tasks_per_job = tasks_per_job
         self.time = time
         self.job_name = job_name
-        self.qos = qos
+        #self.qos = qos
         self.env_command = env_command
         self.condaenv = condaenv
         self.venv_path = venv_path
@@ -293,6 +295,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         os.makedirs(self.slurm_logs_folder, exist_ok=True)
         slurm_logfile = os.path.join(self.slurm_logs_folder, "%A_%a.out")
         sbatch_args = {
+            "account": self.account,
             "cpus-per-task": self.cpus_per_task,
             "mem-per-cpu": f"{self.mem_per_cpu_gb}G",
             "constraint": self.constraint,
