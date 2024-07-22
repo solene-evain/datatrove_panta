@@ -277,7 +277,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         while launched_jobs * max_array < nb_jobs_to_launch:
             if launched_jobs and self.max_array_launch_parallel and self.stagger_max_array_jobs > 0:
                 time.sleep(self.stagger_max_array_jobs)
-            args = [f"--export=ALL,RUN_OFFSET={launched_jobs}"]
+            args = [f"--export=NONE,RUN_OFFSET={launched_jobs}"]
             if self.dependency:
                 args.append(f"--dependency={self.dependency}")
             self.job_id = launch_slurm_job(launch_file_contents, *args)
