@@ -94,7 +94,6 @@ class SlurmPipelineExecutor(PipelineExecutor):
         mem_per_cpu_gb: int = 2,
         workers: int = -1,
         job_name: str = "data_processing",
-        #qos: str = "normal",
         env_command: str = None,
         condaenv: str = "datatrove",
         venv_path: str = None,
@@ -128,7 +127,6 @@ class SlurmPipelineExecutor(PipelineExecutor):
         self.tasks_per_job = tasks_per_job
         self.time = time
         self.job_name = job_name
-        #self.qos = qos
         self.env_command = env_command
         self.condaenv = condaenv
         self.venv_path = venv_path
@@ -315,8 +313,6 @@ class SlurmPipelineExecutor(PipelineExecutor):
         }
         if self.requeue:
             sbatch_args["requeue"] = ""
-        #if self.qos:
-        #    sbatch_args["qos"] = self.qos
         return sbatch_args
 
     def get_launch_file_contents(self, sbatch_args: dict, run_script: str) -> str:
