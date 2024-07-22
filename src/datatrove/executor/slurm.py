@@ -94,7 +94,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         job_name: str = "data_processing",
         #qos: str = "normal",
         env_command: str = None,
-        condaenv: str = datatrove,
+        condaenv: str = "datatrove",
         venv_path: str = None,
         sbatch_args: dict | None = None,
         max_array_size: int = 1001,
