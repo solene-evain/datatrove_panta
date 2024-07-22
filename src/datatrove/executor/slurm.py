@@ -88,6 +88,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         time: str,
         account: str,
         constraint: str,
+        nodes: int,
         cpus_per_task: int = 1,
         mem_per_cpu_gb: int = 2,
         workers: int = -1,
@@ -119,6 +120,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         self.workers = workers
         self.account = account
         self.constraint = constraint
+        self.nodes = nodes
         self.cpus_per_task = cpus_per_task
         self.mem_per_cpu_gb = mem_per_cpu_gb
         self.tasks_per_job = tasks_per_job
@@ -299,6 +301,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
             "cpus-per-task": self.cpus_per_task,
             "mem-per-cpu": f"{self.mem_per_cpu_gb}G",
             "constraint": self.constraint,
+            "nodes": self.nodes,
             "job-name": self.job_name,
             "time": self.time,
             "output": slurm_logfile,
