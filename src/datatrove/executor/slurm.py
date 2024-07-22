@@ -309,8 +309,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
         }
         if self.requeue:
             sbatch_args["requeue"] = ""
-        if self.qos:
-            sbatch_args["qos"] = self.qos
+        #if self.qos:
+        #    sbatch_args["qos"] = self.qos
         return sbatch_args
 
     def get_launch_file_contents(self, sbatch_args: dict, run_script: str) -> str:
