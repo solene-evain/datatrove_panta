@@ -103,7 +103,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         depends_job_id: str | None = None,
         logging_dir: DataFolderLike = None,
         skip_completed: bool = True,
-        slurm_logs_folder: str = None,
+        slurm_logs_folder: str = "./",
         max_array_launch_parallel: bool = False,
         stagger_max_array_jobs: int = 0,
         run_on_dependency_fail: bool = False,
@@ -283,7 +283,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
             self.job_id = launch_slurm_job(launch_file_contents, *args)
             launched_jobs += 1
         logger.info(f"Slurm job launched successfully with (last) id={self.job_id}.")
-        self.launch_merge_stats()
+        #self.launch_merge_stats()
 
     def get_sbatch_args(self, max_array: int = 1) -> dict:
         """
