@@ -21,11 +21,11 @@ from datatrove.pipeline.base import PipelineStep
 from datatrove.utils.logging import get_random_str, get_timestamp, logger
 
 
-def requeue_handler(signum, _frame):
-    signame = signal.Signals(signum).name
-    logger.warning(f"Received signal {signum} ({signame}). Requeueing and exiting...")
-    subprocess.run(["scontrol", "requeue", os.environ.get("SLURM_JOB_ID")])
-    sys.exit(15)
+#def requeue_handler(signum, _frame):
+#    signame = signal.Signals(signum).name
+#    logger.warning(f"Received signal {signum} ({signame}). Requeueing and exiting...")
+#    subprocess.run(["scontrol", "requeue", os.environ.get("SLURM_JOB_ID")])
+#    sys.exit(15)
 
 
 class SlurmPipelineExecutor(PipelineExecutor):
@@ -108,10 +108,11 @@ class SlurmPipelineExecutor(PipelineExecutor):
         stagger_max_array_jobs: int = 0,
         run_on_dependency_fail: bool = False,
         randomize_start_duration: int = 0,
-        requeue_signals: tuple[str] | None = ("SIGUSR1",),
+        #requeue_signals: tuple[str] | None = ("SIGUSR1",),
+        #requeue_signals: None,
         mail_type: str = "ALL",
         mail_user: str = "solene.evain@univ-grenoble-alpes.fr",
-        requeue: bool = True,
+        #requeue: bool = False,
         srun_args: dict = None,
         tasks_per_job: int = 1,
     ):
@@ -139,7 +140,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         self.run_on_dependency_fail = run_on_dependency_fail
         self.randomize_start_duration = randomize_start_duration
         self.job_id = None
-        self.requeue_signals = requeue_signals
+        #self.requeue_signals = requeue_signals
         self.mail_type = mail_type
         self.mail_user = mail_user
         self.srun_args = srun_args
@@ -152,7 +153,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
                 else self.logging_dir.resolve_paths("slurm_logs")
             )
         )
-        self.requeue = requeue
+        #self.requeue = requeue
 
     def run(self):
         """
@@ -173,8 +174,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
             if ranks_to_run_range[0] >= len(all_ranks):
                 return
 
-            for ss in self.requeue_signals or []:
-                signal.signal(signal.Signals[ss], requeue_handler)
+            #for ss in self.requeue_signals or []:
+            #    signal.signal(signal.Signals[ss], requeue_handler)
 
             for rank_to_run in range(*ranks_to_run_range):
                 if rank_to_run >= len(all_ranks):
@@ -311,8 +312,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
             **({"mail-type": self.mail_type, "mail-user": self.mail_user} if self.mail_user else {}),
             **self._sbatch_args,
         }
-        if self.requeue:
-            sbatch_args["requeue"] = ""
+        #if self.requeue:
+        #    sbatch_args["requeue"] = ""
         return sbatch_args
 
     def get_launch_file_contents(self, sbatch_args: dict, run_script: str) -> str:
