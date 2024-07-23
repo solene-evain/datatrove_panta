@@ -21,11 +21,11 @@ from datatrove.pipeline.base import PipelineStep
 from datatrove.utils.logging import get_random_str, get_timestamp, logger
 
 
-#def requeue_handler(signum, _frame):
-#    signame = signal.Signals(signum).name
-#    logger.warning(f"Received signal {signum} ({signame}). Requeueing and exiting...")
-#    subprocess.run(["scontrol", "requeue", os.environ.get("SLURM_JOB_ID")])
-#    sys.exit(15)
+def requeue_handler(signum, _frame):
+    signame = signal.Signals(signum).name
+    logger.warning(f"Received signal {signum} ({signame}). Requeueing and exiting...")
+    subprocess.run(["scontrol", "requeue", os.environ.get("SLURM_JOB_ID")])
+    sys.exit(15)
 
 
 class SlurmPipelineExecutor(PipelineExecutor):
@@ -90,6 +90,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
         constraint: str,
         nodes: int,
         gpus_per_node: int,
+        threads_per_core: int,
+        ntasks_per_node: int,
         cpus_per_task: int = 1,
         mem_per_cpu_gb: int = 2,
         workers: int = -1,
@@ -108,11 +110,11 @@ class SlurmPipelineExecutor(PipelineExecutor):
         stagger_max_array_jobs: int = 0,
         run_on_dependency_fail: bool = False,
         randomize_start_duration: int = 0,
-        #requeue_signals: tuple[str] | None = ("SIGUSR1",),
-        #requeue_signals: None,
+        requeue_signals: tuple[str] | None = ("SIGUSR1",),
+        requeue_signals: None,
         mail_type: str = "ALL",
         mail_user: str = "solene.evain@univ-grenoble-alpes.fr",
-        #requeue: bool = False,
+        requeue: bool = False,
         srun_args: dict = None,
         tasks_per_job: int = 1,
     ):
@@ -124,6 +126,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
         self.nodes = nodes
         self.gpus_per_node = gpus_per_node
         self.cpus_per_task = cpus_per_task
+        self.threads_per_core = threads_per_core
+        self.ntasks_per_node = ntasks_per_node
         self.mem_per_cpu_gb = mem_per_cpu_gb
         self.tasks_per_job = tasks_per_job
         self.time = time
@@ -140,7 +144,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
         self.run_on_dependency_fail = run_on_dependency_fail
         self.randomize_start_duration = randomize_start_duration
         self.job_id = None
-        #self.requeue_signals = requeue_signals
+        self.requeue_signals = requeue_signals
         self.mail_type = mail_type
         self.mail_user = mail_user
         self.srun_args = srun_args
@@ -153,7 +157,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
                 else self.logging_dir.resolve_paths("slurm_logs")
             )
         )
-        #self.requeue = requeue
+        self.requeue = requeue
 
     def run(self):
         """
@@ -174,8 +178,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
             if ranks_to_run_range[0] >= len(all_ranks):
                 return
 
-            #for ss in self.requeue_signals or []:
-            #    signal.signal(signal.Signals[ss], requeue_handler)
+            for ss in self.requeue_signals or []:
+                signal.signal(signal.Signals[ss], requeue_handler)
 
             for rank_to_run in range(*ranks_to_run_range):
                 if rank_to_run >= len(all_ranks):
@@ -201,7 +205,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
                     "mem-per-cpu": "1G",
                     "dependency": f"afterok:{self.job_id}",
                 },
-                #f'merge_stats {self.logging_dir.resolve_paths("stats")} '
+                f'merge_stats {self.logging_dir.resolve_paths("stats")} '
                 f'-o {self.logging_dir.resolve_paths("stats.json")}',
             )
         )
@@ -277,13 +281,13 @@ class SlurmPipelineExecutor(PipelineExecutor):
         while launched_jobs * max_array < nb_jobs_to_launch:
             if launched_jobs and self.max_array_launch_parallel and self.stagger_max_array_jobs > 0:
                 time.sleep(self.stagger_max_array_jobs)
-            args = [f"--export=NONE,RUN_OFFSET={launched_jobs}"]
+            args = [f"--export=ALL,RUN_OFFSET={launched_jobs}"]
             if self.dependency:
                 args.append(f"--dependency={self.dependency}")
             self.job_id = launch_slurm_job(launch_file_contents, *args)
             launched_jobs += 1
         logger.info(f"Slurm job launched successfully with (last) id={self.job_id}.")
-        #self.launch_merge_stats()
+        self.launch_merge_stats()
 
     def get_sbatch_args(self, max_array: int = 1) -> dict:
         """
@@ -301,6 +305,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
             "account": self.account,
             "cpus-per-task": self.cpus_per_task,
             "mem-per-cpu": f"{self.mem_per_cpu_gb}G",
+            "threads-per-core": self.threads_per_core,
+            "ntasks-per-node": self.ntasks_per_node,
             "constraint": self.constraint,
             "nodes": self.nodes,
             "gpus-per-node": self.gpus_per_node,
@@ -312,8 +318,8 @@ class SlurmPipelineExecutor(PipelineExecutor):
             **({"mail-type": self.mail_type, "mail-user": self.mail_user} if self.mail_user else {}),
             **self._sbatch_args,
         }
-        #if self.requeue:
-        #    sbatch_args["requeue"] = ""
+        if self.requeue:
+            sbatch_args["requeue"] = ""
         return sbatch_args
 
     def get_launch_file_contents(self, sbatch_args: dict, run_script: str) -> str:
