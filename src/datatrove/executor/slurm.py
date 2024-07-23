@@ -111,7 +111,6 @@ class SlurmPipelineExecutor(PipelineExecutor):
         run_on_dependency_fail: bool = False,
         randomize_start_duration: int = 0,
         requeue_signals: tuple[str] | None = ("SIGUSR1",),
-        requeue_signals: None,
         mail_type: str = "ALL",
         mail_user: str = "solene.evain@univ-grenoble-alpes.fr",
         requeue: bool = False,
