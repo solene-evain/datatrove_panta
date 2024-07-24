@@ -351,6 +351,7 @@ class SlurmPipelineExecutor(PipelineExecutor):
             + textwrap.dedent(
                 f"""
         echo "Starting data processing job {self.job_name}"
+        module load conda
         {env_command}
         set -xe
         export PYTHONUNBUFFERED=TRUE
