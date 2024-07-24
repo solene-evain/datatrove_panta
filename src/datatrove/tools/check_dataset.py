@@ -53,7 +53,7 @@ def load_dataset_bytes(file, doc_ends, bytes_per_value: int = 2):
         assert f.read(1) == b"", "Dataset should be exhausted but there is more data to read"
 
 
-def check_dataset(input_folder: DataFolder, tokenizer: str = "gpt2", eos_token: str = "<|endoftext|>"):
+def check_dataset(input_folder: DataFolder, tokenizer: str = "/lus/home/CT10/lig3801/sevain/.cache/huggingface/hub/models--gpt2/snapshots/607a30d783dfa663caf39e06633721c8d4cfcd7e/tokenizer.json", eos_token: str = "<|endoftext|>"):
     """
     Reads a dataset and checks if loss tokens match up to the corresponding doc ends files
     Args:
