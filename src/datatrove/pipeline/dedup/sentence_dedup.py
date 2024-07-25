@@ -127,6 +127,7 @@ class SentenceDedupSignature(PipelineStep):
 
     def get_hashes(self, doc: Document, doc_idx: int) -> list[None] | list[tuple[int, int, int]]:
         sentences = self.tokenizer.sent_tokenize(doc.text) if self.config.split_sentences else doc.text.splitlines()
+        print(sentences) ## ADDED
         if len(sentences) < self.config.n_sentences:
             return []
 
