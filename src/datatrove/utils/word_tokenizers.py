@@ -219,7 +219,7 @@ WORD_TOKENIZER_FACTORY: dict[str, Callable[[], WordTokenizer]] = {
     Languages.english: lambda: NLTKTokenizer("english"),
     Languages.korean: lambda: KiwiTokenizer(),
     Languages.german: lambda: NLTKTokenizer("german"),
-    Languages.french: lambda: NLTKTokenizer("french"),
+    Languages.french: lambda: SpaCyTokenizer("fr"),
     Languages.czech: lambda: NLTKTokenizer("czech"),
     Languages.danish: lambda: NLTKTokenizer("danish"),
     Languages.dutch: lambda: NLTKTokenizer("dutch"),
