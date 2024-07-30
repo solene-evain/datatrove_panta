@@ -95,7 +95,7 @@ class DiskWriter(PipelineStep, ABC):
             {"rank": str(rank).zfill(5), "id": document.id, **document.metadata, **kwargs}
         )
 
-    @abstractmethod
+    #@abstractmethod
     def _write(self, document: dict, file_handler: IO, filename: str):
         """
         Main method that subclasses should implement. Receives an adapted (after applying self.adapter) dictionary with data to save to `file_handler`
