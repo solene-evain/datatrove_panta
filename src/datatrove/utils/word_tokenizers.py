@@ -46,7 +46,7 @@ class NLTKTokenizer(WordTokenizer):
             from nltk import load
 
             #self._tokenizer = load(f"tokenizers/punkt/{self.punkt_language}.pickle")
-            self._tokenizer = load(f"{self.punkt_language}")
+            self._tokenizer = load(f"{self.punkt_language}",format="raw")
         return self._tokenizer
 
     def word_tokenize(self, text) -> list[str]:
