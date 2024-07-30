@@ -44,7 +44,8 @@ class NLTKTokenizer(WordTokenizer):
         if self._tokenizer is None:
             from nltk import load
 
-            self._tokenizer = load(f"tokenizers/punkt/{self.punkt_language}.pickle")
+            #self._tokenizer = load(f"tokenizers/punkt/{self.punkt_language}.pickle")
+            self._tokenizer = load(f"{self.punkt_language}")
         return self._tokenizer
 
     def word_tokenize(self, text) -> list[str]:
@@ -219,7 +220,8 @@ WORD_TOKENIZER_FACTORY: dict[str, Callable[[], WordTokenizer]] = {
     Languages.english: lambda: NLTKTokenizer("english"),
     Languages.korean: lambda: KiwiTokenizer(),
     Languages.german: lambda: NLTKTokenizer("german"),
-    Languages.french: lambda: SpaCyTokenizer("fr"),
+    #Languages.french: lambda: SpaCyTokenizer("fr"),
+    Languages.french: lambda: NLTKTokenizer("french"),
     Languages.czech: lambda: NLTKTokenizer("czech"),
     Languages.danish: lambda: NLTKTokenizer("danish"),
     Languages.dutch: lambda: NLTKTokenizer("dutch"),
