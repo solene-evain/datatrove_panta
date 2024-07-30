@@ -37,6 +37,7 @@ class NLTKTokenizer(WordTokenizer):
         super().__init__()
         check_required_dependencies(f"{punkt_language} word tokenizer", ["nltk"])
         self.punkt_language = punkt_language
+        print(self.punkt_language)
         self._tokenizer = None
 
     @property
