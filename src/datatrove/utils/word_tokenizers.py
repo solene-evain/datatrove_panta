@@ -326,6 +326,8 @@ WORD_TOKENIZER_CACHE: dict[str, WordTokenizer] = {}
 def load_word_tokenizer(language: str) -> WordTokenizer:
     if language not in WORD_TOKENIZER_CACHE:
         if language not in WORD_TOKENIZER_FACTORY:
+            for l,v in WORD_TOKENIZER_FACTORY.items():
+                print(l,v)
             raise ValueError(f"Language '{language}' doesn't have a tokenizer.")
         tokenizer = WORD_TOKENIZER_FACTORY[language]()
         WORD_TOKENIZER_CACHE[language] = tokenizer
